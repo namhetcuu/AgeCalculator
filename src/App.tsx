@@ -1,48 +1,47 @@
-import React, { useState, useCallback } from "react";
-import {
-  IonApp,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonContent,
-  IonInput,
-  IonButton,
-  IonItem,
-  IonLabel,
-  IonIcon,
-  IonToast,
-} from "@ionic/react";
-import { shareSocial, camera, calculator, refresh } from "ionicons/icons";
+import React, { useState, useEffect, useCallback } from "react";
 import { LocalNotifications } from "@capacitor/local-notifications";
 import { Share } from "@capacitor/share";
-import { Camera, CameraResultType } from "@capacitor/camera";
+import { Geolocation } from "@capacitor/geolocation";
 import "./App.css";
 
 const App: React.FC = () => {
-  const [birthYear, setBirthYear] = useState<number | "">("");
-  const [age, setAge] = useState<number | null>(null);
-  const [photo, setPhoto] = useState<string | null>(null);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [celsiusTemp, setCelsiusTemp] = useState<string>("");
+  const [fahrenheitTemp, setFahrenheitTemp] = useState<string>("");
+  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
-  const calculateAge = useCallback(() => {
-    if (!birthYear || typeof birthYear !== "number" || birthYear < 1900 || birthYear > new Date().getFullYear()) {
-      setToastMessage("❌ Vui lòng nhập năm sinh hợp lệ!");
+  // Hàm chuyển đổi nhiệt độ
+  const convertTemperature = () => {
+    const celsius = parseFloat(celsiusTemp);
+    if (isNaN(celsius)) {
+      setErrorMessage("Vui lòng nhập một giá trị nhiệt độ hợp lệ");
       return;
     }
-    const currentYear = new Date().getFullYear();
-    const userAge = currentYear - birthYear;
-    setAge(userAge);
-    sendNotification(userAge);
-  }, [birthYear]);
 
-  const sendNotification = useCallback(async (userAge: number) => {
+    setErrorMessage("");
+    const fahrenheit = (celsius * 9) / 5 + 32;
+    setFahrenheitTemp(fahrenheit.toFixed(2));
+    showNotification(celsius, fahrenheit);
+  };
+
+  // Hiển thị thông báo cục bộ
+  const showNotification = useCallback(async (celsius: number, fahrenheit: number) => {
     try {
+      const perm = await LocalNotifications.checkPermissions();
+      if (perm.display !== "granted") {
+        const request = await LocalNotifications.requestPermissions();
+        if (request.display !== "granted") {
+          console.warn("Quyền thông báo chưa được cấp.");
+          return;
+        }
+      }
+
       await LocalNotifications.schedule({
         notifications: [
           {
-            title: "🎉 Kết quả tính tuổi 🎉",
-            body: `Bạn ${userAge} tuổi rồi đó! 🥳`,
-            id: 1,
+            title: "Chuyển đổi nhiệt độ",
+            body: `${celsius}°C = ${fahrenheit.toFixed(2)}°F`,
+            id: Date.now() % 2147483647, // Giảm giá trị ID để tránh lỗi Java int
             schedule: { at: new Date(Date.now() + 1000) },
           },
         ],
@@ -52,74 +51,85 @@ const App: React.FC = () => {
     }
   }, []);
 
-  const shareAge = useCallback(async () => {
-    if (age !== null) {
-      try {
-        await Share.share({
-          title: "Kết quả tính tuổi",
-          text: `🎂 Tôi đã tính tuổi và tôi ${age} tuổi! 🎉`,
-          dialogTitle: "Chia sẻ kết quả",
-        });
-      } catch (error) {
-        console.error("Lỗi chia sẻ:", error);
-      }
+  // Chia sẻ kết quả
+  const shareResult = async () => {
+    if (!fahrenheitTemp) {
+      setErrorMessage("Không có kết quả để chia sẻ");
+      return;
     }
-  }, [age]);
+    await Share.share({
+      title: "Kết quả chuyển đổi nhiệt độ",
+      text: `${celsiusTemp}°C = ${fahrenheitTemp}°F`,
+      url: "https://ionicframework.com/",
+      dialogTitle: "Chia sẻ kết quả",
+    });
+  };
 
-  const takePhoto = useCallback(async () => {
+  // Lấy vị trí hiện tại
+  const getCurrentLocation = async () => {
     try {
-      const image = await Camera.getPhoto({
-        quality: 90,
-        allowEditing: false,
-        resultType: CameraResultType.Uri,
+      const permStatus = await Geolocation.checkPermissions();
+  
+      if (permStatus.location !== 'granted') {
+        const request = await Geolocation.requestPermissions();
+        if (request.location !== 'granted') {
+          setErrorMessage("Ứng dụng không có quyền truy cập vị trí.");
+          return;
+        }
+      }
+  
+      const position = await Geolocation.getCurrentPosition();
+      setLocation({
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
       });
-      setPhoto(image.webPath || null);
+  
     } catch (error) {
-      console.error("Lỗi chụp ảnh:", error);
+      setErrorMessage("Không thể lấy vị trí hiện tại.");
+      console.error(error);
     }
-  }, []);
-
-  const resetAll = useCallback(() => {
-    setBirthYear("");
-    setAge(null);
-    setPhoto(null);
-    setToastMessage("✅ Đã reset dữ liệu!");
-  }, []);
+  };
 
   return (
-    <IonApp>
-      <IonHeader className="app-header">
-        <IonToolbar>
-          <IonTitle>🎂 Ứng dụng Tính Tuổi 📅</IonTitle>
-        </IonToolbar>
-      </IonHeader>
+    <div className="app">
+      <div className="container">
+        <h1>Chuyển đổi nhiệt độ</h1>
 
-      <IonContent className="app-container">
-        <IonItem>
-          <IonLabel position="floating">Nhập năm sinh</IonLabel>
-          <IonInput
+        <div className="input-group">
+          <label htmlFor="celsius">Nhiệt độ (°C):</label>
+          <input
+            id="celsius"
             type="number"
-            className="app-input-field"
-            value={birthYear}
-            onIonChange={(e) => setBirthYear(parseInt(e.detail.value!, 10) || "")}
+            value={celsiusTemp}
+            onChange={(e) => setCelsiusTemp(e.target.value)}
+            placeholder="Nhập độ C"
           />
-        </IonItem>
-
-        <div className="button-container">
-          <IonButton className="transparent-button" onClick={calculateAge}>
-            <IonIcon icon={calculator} slot="start" /> Tính tuổi
-          </IonButton>
-
-          {age !== null && <div className="age-result">🎈🤣🎈 Bạn {age} tuổi rồi! 🎈🤣</div>}
-          {age !== null && <IonButton className="app-button-1" onClick={shareAge}>Chia sẻ</IonButton>}
-          <IonButton className="app-button-1 tertiary" onClick={takePhoto}>Chụp ảnh</IonButton>
-          <IonButton className="reset-button" onClick={resetAll}>Reset</IonButton>
         </div>
 
-        {photo && <img src={photo} alt="Ảnh chụp" className="app-image" />}
-        <IonToast isOpen={!!toastMessage} message={toastMessage || ""} duration={2000} />
-      </IonContent>
-    </IonApp>
+        <div className="button-group">
+          <button className="primary-button" onClick={convertTemperature}>Chuyển đổi</button>
+          <button className="secondary-button" onClick={shareResult} disabled={!fahrenheitTemp}>Chia sẻ kết quả</button>
+          <button className="tertiary-button" onClick={getCurrentLocation}>Lấy vị trí hiện tại</button>
+        </div>
+
+        {errorMessage && <p className="error">{errorMessage}</p>}
+
+        {fahrenheitTemp && (
+          <div className="result">
+            <h2>Kết quả:</h2>
+            <p>{celsiusTemp}°C = {fahrenheitTemp}°F</p>
+          </div>
+        )}
+
+        {location && (
+          <div className="location">
+            <h3>Vị trí hiện tại:</h3>
+            <p>Vĩ độ: {location.latitude}</p>
+            <p>Kinh độ: {location.longitude}</p>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 

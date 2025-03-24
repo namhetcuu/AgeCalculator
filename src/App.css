@@ -1,186 +1,136 @@
-/* 🌟 Thiết lập giao diện nền lung linh */
+/* App.css - Giao diện cải tiến với UI/UX thân thiện */
+
+:root {
+  --primary-color: #4CAF50;
+  --secondary-color: #FF9800;
+  --background-light: #F5F5F5;
+  --text-color: #333;
+  --button-hover: #45A049;
+  --input-border: #DADADA;
+}
+
 body {
-  font-family: "Arial", sans-serif;
-  background: linear-gradient(135deg, #007991, #78ffd6);
-  color: white;
-  text-align: center;
-  margin: 0;
-  padding: 0;
-}
-
-/* 📌 Container chính */
-.app-container {
+  font-family: "Poppins", sans-serif;
+  background-color: var(--background-light);
+  color: var(--text-color);
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  text-align: center;
-  padding: 20px;
-  min-height: 100vh;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
 }
 
-/* 🔵 Header */
-.app-header {
-  font-size: 28px;
-  font-weight: bold;
-  padding: 15px 0;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-  background: rgba(0, 0, 0, 0.2);
-}
-
-/* 📝 Ô nhập năm sinh */
-.app-input-field::part(native) {
-  width: 90%;
+.app {
+  width: 100%;
   max-width: 400px;
-  padding: 12px;
-  font-size: 18px;
-  border: 2px solid #4caf50;
-  border-radius: 8px;
-  outline: none;
-  background: rgba(255, 255, 255, 0.8);
-  color: black;
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   text-align: center;
-  margin: 12px auto;
-  display: block;
 }
 
-.app-input-field:focus::part(native) {
-  border-color: #3880ff;
-  box-shadow: 0 0 10px rgba(56, 128, 255, 0.7);
+h1 {
+  font-size: 1.8rem;
+  color: var(--primary-color);
 }
 
-/* 🔘 Hiệu ứng nút */
-.button-container {
+/* Ô nhập nhiệt độ */
+.input-group {
+  margin: 20px 0;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  border: 2px solid var(--input-border);
+  border-radius: 25px;
+  outline: none;
+  transition: border 0.3s ease-in-out;
+}
+
+input:focus {
+  border-color: var(--primary-color);
+}
+
+/* Các nút chức năng */
+.button-group {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  align-items: center;
+  gap: 10px;
   margin-top: 20px;
 }
-/* 🔘 Nút không có nền nhưng vẫn có hiệu ứng */
-.transparent-button {
-  background: none !important; /* ✅ Xóa nền */
-  border: 2px solid white; /* ✅ Viền trắng để dễ thấy */
-  color: white; /* ✅ Chữ trắng */
-  padding: 10px 20px;
-  font-size: 18px;
-  font-weight: bold;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-}
 
-/* ✨ Hiệu ứng khi hover */
-.transparent-button:hover {
-  background: rgba(255, 255, 255, 0.2); /* ✅ Nền mờ nhẹ khi hover */
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5); /* ✨ Hiệu ứng nổi bật */
-  color: #ffd700; /* 🎨 Đổi màu chữ */
-}
-
-/* 🔥 Hiệu ứng khi bấm */
-.transparent-button:active {
-  background: rgba(255, 255, 255, 0.3); /* ✅ Nhấn vào sẽ sáng hơn */
-  transform: scale(0.95); /* ✅ Hiệu ứng nhấn */
-}
-/* 🌟 Thiết kế nút đẹp hơn */
-.custom-button {
-  display: flex; /* ✅ Căn giữa nội dung */
-  align-items: center; /* ✅ Giữ icon và text cùng hàng */
-  justify-content: center; /* ✅ Căn giữa chữ trong nút */
-  width: 90%; /* ✅ Giữ kích thước đẹp trên mobile */
-  max-width: 400px;
-  padding: 14px 20px;
-  font-size: 18px;
+button {
+  padding: 12px;
+  font-size: 1rem;
   font-weight: bold;
-  text-transform: uppercase; /* 🔤 Chữ in hoa */
-  color: white; /* 🎨 Chữ trắng nổi bật */
   border: none;
-  border-radius: 8px;
+  border-radius: 25px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background 0.3s, transform 0.2s;
 }
 
-/* 🔹 Hiệu ứng hover */
-.custom-button:hover {
-  opacity: 0.8;
+.primary-button {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.primary-button:hover {
+  background-color: var(--button-hover);
   transform: scale(1.05);
 }
 
-/* 🎨 Các màu khác nhau cho từng nút */
-.custom-button.share {
-  background: linear-gradient(135deg, #007bff, #0056b3);
+.secondary-button {
+  background-color: var(--secondary-color);
+  color: white;
 }
 
-.custom-button.camera {
-  background: linear-gradient(135deg, #6a11cb, #2575fc);
+.secondary-button:hover {
+  background-color: #E68900;
+  transform: scale(1.05);
 }
 
-.custom-button.reset {
-  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+.tertiary-button {
+  background-color: #2196F3;
+  color: white;
 }
 
-.app-button,
-.app-button-1,
-.reset-button {
-  width: 90%;
-  max-width: 400px;
-  padding: 12px;
-  font-size: 18px;
+.tertiary-button:hover {
+  background-color: #1976D2;
+  transform: scale(1.05);
+}
+
+/* Kết quả hiển thị */
+.result {
+  margin-top: 20px;
+  padding: 15px;
+  font-size: 1.5rem;
   font-weight: bold;
-  border-radius: 8px;
-  transition: all 0.3s ease;
+  background: rgba(76, 175, 80, 0.1);
+  border-radius: 15px;
+  color: var(--primary-color);
+  animation: fadeIn 0.5s ease-in-out;
 }
 
-/* 🟢 Nút tính tuổi */
-.app-button {
-  background: linear-gradient(135deg, #28a745, #218838);
-  color: white;
-}
-
-.app-button:hover {
-  background: linear-gradient(135deg, #34d058, #1e7e34);
-}
-
-/* 🔵 Nút chia sẻ */
-.app-button-1 {
-  background: linear-gradient(135deg, #007bff, #0056b3);
-  color: white;
-}
-
-.app-button-1:hover {
-  background: linear-gradient(135deg, #3399ff, #0048a3);
-}
-
-/* 🟣 Nút chụp ảnh */
-.app-button-1.tertiary {
-  background: linear-gradient(135deg, #6f42c1, #5a32a3);
-}
-
-.app-button-1.tertiary:hover {
-  background: linear-gradient(135deg, #7d4cd9, #4c2890);
-}
-
-/* 🔴 Nút reset */
-.reset-button {
-  background: linear-gradient(135deg, #dc3545, #a71d2a);
-  color: white;
-}
-
-.reset-button:hover {
-  background: linear-gradient(135deg, #e85c6b, #87141f);
-}
-
-/* 🎂 Hiển thị kết quả */
-.age-result {
-  font-size: 4rem;
-  font-weight: bold;
+/* Vị trí hiện tại */
+.location {
   margin-top: 15px;
-  color: black;
-}
-
-/* 📸 Ảnh chụp */
-.app-image {
-  margin-top: 15px;
-  max-width: 300px;
+  font-size: 1rem;
+  background: rgba(33, 150, 243, 0.1);
+  padding: 10px;
   border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Hiệu ứng xuất hiện mượt mà */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
