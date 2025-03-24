@@ -40,4 +40,5 @@
 - Nếu gặp lỗi, thử chạy `npx cap doctor` để kiểm tra cấu hình.
 
 Chúc bạn thành công!
+Copywrite by Namnam
 
